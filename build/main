@@ -1,0 +1,505 @@
+	.file	"main.cpp"
+	.option nopic
+	.attribute arch, "rv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0"
+	.attribute unaligned_access, 0
+	.attribute stack_align, 16
+# GNU C++20 (gc891d8dc23e-dirty) version 13.2.0 (riscv64-unknown-linux-gnu)
+#	compiled by GNU C version 11.4.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version none
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -mtune=rocket -mabi=lp64d -misa-spec=20191213 -march=rv64imafdc_zicsr -O3 -std=c++20
+	.text
+	.align	1
+	.globl	_Znwm
+	.type	_Znwm, @function
+_Znwm:
+.LFB3814:
+	.cfi_startproc
+# memory/allocator.hpp:44:     auto block = heapStart;
+	lui	a2,%hi(_ZN6memoryL9heapStartE)	# tmp164,
+	ld	a3,%lo(_ZN6memoryL9heapStartE)(a2)		# block, heapStart
+# memory/allocator.hpp:26:     return (n + sizeof(word_t) - 1) & ~(sizeof(word_t) - 1);
+	addi	a4,a0,7	#, tmp147, tmp168
+# memory/allocator.hpp:26:     return (n + sizeof(word_t) - 1) & ~(sizeof(word_t) - 1);
+	andi	a4,a4,-8	#, _11, tmp147
+# memory/allocator.hpp:46:     while (block != nullptr) {
+	beq	a3,zero,.L2	#, block,,
+# memory/allocator.hpp:44:     auto block = heapStart;
+	mv	a0,a3	# block, block
+.L5:
+# memory/allocator.hpp:47:         if (block->used || block->size < size) {
+	lbu	a5,8(a0)	# block_3->used, block_3->used
+	bne	a5,zero,.L3	#, block_3->used,,
+# memory/allocator.hpp:47:         if (block->used || block->size < size) {
+	ld	a5,0(a0)		# block_3->size, block_3->size
+	bgtu	a4,a5,.L3	#, _11, block_3->size,
+# memory/allocator.hpp:63:         return block->data;
+	addi	a0,a0,24	#, <retval>, block
+# main.cpp:18: }
+	ret	
+.L3:
+# memory/allocator.hpp:48:             block = block->next;
+	ld	a0,16(a0)		# block, block_3->next
+# memory/allocator.hpp:46:     while (block != nullptr) {
+	bne	a0,zero,.L5	#, block,,
+.L2:
+# memory/../syscall/syscall.hpp:10:     __asm__ volatile("addi a7, zero, 9\n\t"
+	li	a5,0		# tmp154,
+#APP
+# 10 "memory/../syscall/syscall.hpp" 1
+	addi a7, zero, 9
+	add a0, zero, a5	# tmp154
+	ecall
+	mv a5, a0	# result
+# 0 "" 2
+# memory/allocator.hpp:30:     return size + sizeof(Block) - sizeof(std::declval<Block>().data);
+#NO_APP
+	addi	a1,a4,24	#, tmp156, _11
+# memory/../syscall/syscall.hpp:10:     __asm__ volatile("addi a7, zero, 9\n\t"
+#APP
+# 10 "memory/../syscall/syscall.hpp" 1
+	addi a7, zero, 9
+	add a0, zero, a1	# tmp156
+	ecall
+	mv a1, a0	# result
+# 0 "" 2
+# memory/allocator.hpp:36:     if (rsyscall::my_sbrk(allocSize(size)) == (void*)-1) {
+#NO_APP
+	li	a0,-1		# tmp157,
+	beq	a1,a0,.L6	#, result, tmp157,
+# memory/allocator.hpp:68:     block->size = size;
+	sd	a4,0(a5)	# _11, MEM[(struct Block *)result_19].size
+# memory/allocator.hpp:69:     block->used = true;
+	li	a4,1		# tmp158,
+	sb	a4,8(a5)	# tmp158, MEM[(struct Block *)result_19].used
+# memory/allocator.hpp:71:     if (heapStart == nullptr) {
+	beq	a3,zero,.L18	#, block,,
+.L7:
+# memory/allocator.hpp:75:     if (top != nullptr) {
+	lui	a4,%hi(_ZN6memoryL3topE)	# tmp165,
+	ld	a3,%lo(_ZN6memoryL3topE)(a4)		# top.1_24, top
+# memory/allocator.hpp:75:     if (top != nullptr) {
+	beq	a3,zero,.L8	#, top.1_24,,
+# memory/allocator.hpp:76:         top->next = block;
+	sd	a5,16(a3)	# result, top.1_24->next
+.L8:
+# memory/allocator.hpp:78:     top = block;
+	sd	a5,%lo(_ZN6memoryL3topE)(a4)	# result, top
+# memory/allocator.hpp:79:     return block->data;
+	addi	a0,a5,24	#, <retval>, result
+# main.cpp:16:         return p;
+	ret	
+.L18:
+# memory/allocator.hpp:72:         heapStart = block;
+	sd	a5,%lo(_ZN6memoryL9heapStartE)(a2)	# result, heapStart
+	j	.L7		#
+.L6:
+# memory/allocator.hpp:68:     block->size = size;
+	sd	zero,0(zero)	#, MEM[(struct Block *)0B].size
+	ebreak	
+	.cfi_endproc
+.LFE3814:
+	.size	_Znwm, .-_Znwm
+	.align	1
+	.globl	_ZdlPv
+	.type	_ZdlPv, @function
+_ZdlPv:
+.LFB3815:
+	.cfi_startproc
+# memory/allocator.hpp:89:     block->used = false;
+	sb	zero,-16(a0)	#, MEM[(struct Block *)p_2(D) + -24B].used
+# main.cpp:22: }
+	ret	
+	.cfi_endproc
+.LFE3815:
+	.size	_ZdlPv, .-_ZdlPv
+	.align	1
+	.globl	_Znam
+	.type	_Znam, @function
+_Znam:
+.LFB4526:
+	.cfi_startproc
+	lui	a2,%hi(_ZN6memoryL9heapStartE)	# tmp164,
+	ld	a3,%lo(_ZN6memoryL9heapStartE)(a2)		# block, heapStart
+	addi	a4,a0,7	#, tmp147, tmp168
+	andi	a4,a4,-8	#, _8, tmp147
+	beq	a3,zero,.L21	#, block,,
+	mv	a0,a3	# block, block
+.L24:
+	lbu	a5,8(a0)	# block_33->used, block_33->used
+	bne	a5,zero,.L22	#, block_33->used,,
+	ld	a5,0(a0)		# block_33->size, block_33->size
+	bgtu	a4,a5,.L22	#, _8, block_33->size,
+	addi	a0,a0,24	#, <retval>, block
+	ret	
+.L22:
+	ld	a0,16(a0)		# block, block_33->next
+	bne	a0,zero,.L24	#, block,,
+.L21:
+	li	a5,0		# tmp154,
+#APP
+# 10 "memory/../syscall/syscall.hpp" 1
+	addi a7, zero, 9
+	add a0, zero, a5	# tmp154
+	ecall
+	mv a5, a0	# result
+# 0 "" 2
+#NO_APP
+	addi	a1,a4,24	#, tmp156, _8
+#APP
+# 10 "memory/../syscall/syscall.hpp" 1
+	addi a7, zero, 9
+	add a0, zero, a1	# tmp156
+	ecall
+	mv a1, a0	# result
+# 0 "" 2
+#NO_APP
+	li	a0,-1		# tmp157,
+	beq	a1,a0,.L25	#, result, tmp157,
+	sd	a4,0(a5)	# _8, MEM[(struct Block *)result_16].size
+	li	a4,1		# tmp158,
+	sb	a4,8(a5)	# tmp158, MEM[(struct Block *)result_16].used
+	beq	a3,zero,.L36	#, block,,
+.L26:
+	lui	a4,%hi(_ZN6memoryL3topE)	# tmp165,
+	ld	a3,%lo(_ZN6memoryL3topE)(a4)		# top.1_21, top
+	beq	a3,zero,.L27	#, top.1_21,,
+	sd	a5,16(a3)	# result, top.1_21->next
+.L27:
+	sd	a5,%lo(_ZN6memoryL3topE)(a4)	# result, top
+	addi	a0,a5,24	#, <retval>, result
+	ret	
+.L36:
+	sd	a5,%lo(_ZN6memoryL9heapStartE)(a2)	# result, heapStart
+	j	.L26		#
+.L25:
+	sd	zero,0(zero)	#, MEM[(struct Block *)0B].size
+	ebreak	
+	.cfi_endproc
+.LFE4526:
+	.size	_Znam, .-_Znam
+	.align	1
+	.globl	_ZdaPv
+	.type	_ZdaPv, @function
+_ZdaPv:
+.LFB4528:
+	.cfi_startproc
+	sb	zero,-16(a0)	#, MEM[(struct Block *)p_2(D) + -24B].used
+	ret	
+	.cfi_endproc
+.LFE4528:
+	.size	_ZdaPv, .-_ZdaPv
+	.section	.text._ZN4rstd3vecIiEC2Em,"axG",@progbits,_ZN4rstd3vecIiEC5Em,comdat
+	.align	1
+	.weak	_ZN4rstd3vecIiEC2Em
+	.type	_ZN4rstd3vecIiEC2Em, @function
+_ZN4rstd3vecIiEC2Em:
+.LFB4125:
+	.cfi_startproc
+	addi	sp,sp,-80	#,,
+	.cfi_def_cfa_offset 80
+	sd	s3,40(sp)	#,
+	sd	s6,16(sp)	#,
+	sd	s7,8(sp)	#,
+	sd	ra,72(sp)	#,
+# util/vec.hpp:34:     explicit vec(size_t size) {
+	sd	zero,0(a0)	#, *this_5(D).data_
+	sd	zero,8(a0)	#, *this_5(D).size_
+	sd	zero,16(a0)	#, *this_5(D).capacity_
+	.cfi_offset 19, -40
+	.cfi_offset 22, -64
+	.cfi_offset 23, -72
+	.cfi_offset 1, -8
+# util/vec.hpp:34:     explicit vec(size_t size) {
+	mv	s3,a0	# this, tmp203
+	mv	s6,a1	# size, tmp204
+	li	s7,1		# prephitmp_25,
+	beq	a1,zero,.L39	#, size,,
+	mv	s7,a1	# prephitmp_25, size
+.L39:
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	li	a5,-9		# tmp177,
+	srli	a5,a5,3	#, tmp177, tmp177
+	bgtu	s6,a5,.L40	#, size, tmp177,
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	slli	a0,s7,2	#,, prephitmp_25
+	sd	s1,56(sp)	#,
+	sd	s2,48(sp)	#,
+	sd	s4,32(sp)	#,
+	sd	s5,24(sp)	#,
+	.cfi_offset 9, -24
+	.cfi_offset 18, -32
+	.cfi_offset 20, -48
+	.cfi_offset 21, -56
+	call	_Znwm		#
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	sd	a0,0(s3)	# prephitmp_17, *this_5(D).data_
+# util/vec.hpp:19:             capacity_ = new_size;
+	sd	s7,16(s3)	# prephitmp_25, *this_5(D).capacity_
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	mv	s2,a0	# prephitmp_17, tmp205
+# util/vec.hpp:36:         for (auto i = 0; i < size; ++i) {
+	li	s1,0		# ivtmp.90,
+	li	s4,0		# prephitmp_32,
+	li	s5,8		# tmp202,
+	beq	s6,zero,.L38	#, size,,
+	sd	s0,64(sp)	#,
+	sd	s8,0(sp)	#,
+	.cfi_offset 8, -16
+	.cfi_offset 24, -80
+.L41:
+# util/vec.hpp:96:         data_[size_++] = value;
+	add	a5,s2,s1	# ivtmp.90, tmp201, prephitmp_17
+# util/vec.hpp:96:         data_[size_++] = value;
+	addi	s0,s4,1	#, _33, prephitmp_32
+	sd	s0,8(s3)	# _33, *this_5(D).size_
+# util/vec.hpp:96:         data_[size_++] = value;
+	sw	zero,0(a5)	#, *_35
+# util/vec.hpp:36:         for (auto i = 0; i < size; ++i) {
+	addi	s1,s1,4	#, ivtmp.90, ivtmp.90
+	beq	s6,s0,.L69	#, size, _33,
+# util/vec.hpp:92:         if (size_ == capacity_) {
+	beq	s7,s0,.L70	#, prephitmp_25, _33,
+# util/vec.hpp:19:             capacity_ = new_size;
+	mv	s4,s0	# prephitmp_32, _33
+	j	.L41		#
+.L70:
+# util/vec.hpp:93:             realloc(capacity_ * 2);
+	slli	s8,s7,1	#, _30, prephitmp_25
+# util/vec.hpp:17:         if (data_ == nullptr) {
+	beq	s2,zero,.L71	#, prephitmp_17,,
+# util/vec.hpp:24:             ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	slli	a0,s0,3	#,, _33
+	call	_Znwm		#
+	bleu	s4,s5,.L44	#, prephitmp_32, tmp202,
+	or	a5,s2,a0	# _38, tmp186, prephitmp_17
+	andi	a5,a5,7	#, tmp187, tmp186
+	bne	a5,zero,.L44	#, tmp187,,
+	addi	a5,s2,4	#, tmp191, prephitmp_17
+	beq	a0,a5,.L44	#, _38, tmp191,
+	srli	a2,s0,1	#, bnd.61, _33
+	slli	a2,a2,3	#, tmp197, bnd.61
+	mv	a5,s2	# ivtmp.80, prephitmp_17
+	mv	a4,a0	# ivtmp.83, _38
+	add	a2,a2,s2	# prephitmp_17, _108, tmp197
+.L45:
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	ld	a3,0(a5)		# vect__45.66, MEM <vector(2) int> [(int *)_104]
+	addi	a5,a5,8	#, ivtmp.80, ivtmp.80
+	addi	a4,a4,8	#, ivtmp.83, ivtmp.83
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	sd	a3,-8(a4)	# vect__45.66, MEM <vector(2) int> [(int *)_105]
+	bne	a5,a2,.L45	#, ivtmp.80, _108,
+	andi	a4,s0,1	#, tmp198, _33
+	andi	a5,s0,-2	#, niters_vector_mult_vf.62, _33
+	beq	a4,zero,.L49	#, tmp198,,
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	slli	a5,a5,2	#, _79, niters_vector_mult_vf.62
+	add	a4,s2,a5	# _79, tmp199, prephitmp_17
+	lw	a4,0(a4)		# _82, *_80
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	add	a5,a0,a5	# _79, tmp200, _38
+	sw	a4,0(a5)	# _82, *_81
+.L49:
+# memory/allocator.hpp:89:     block->used = false;
+	sb	zero,-16(s2)	#, MEM[(struct Block *)prephitmp_24 + -24B].used
+# util/vec.hpp:26:         capacity_ = new_size;
+	sd	s8,16(s3)	# _30, *this_5(D).capacity_
+# util/vec.hpp:28:         data_ = new_data;
+	sd	a0,0(s3)	# _38, *this_5(D).data_
+	mv	s7,s8	# prephitmp_25, _30
+	mv	s2,a0	# prephitmp_17, _38
+# util/vec.hpp:19:             capacity_ = new_size;
+	mv	s4,s0	# prephitmp_32, _33
+	j	.L41		#
+.L69:
+	ld	s0,64(sp)		#,
+	.cfi_restore 8
+	ld	s8,0(sp)		#,
+	.cfi_restore 24
+.L38:
+# util/vec.hpp:39:     }
+	ld	ra,72(sp)		#,
+	.cfi_restore 1
+	ld	s1,56(sp)		#,
+	.cfi_restore 9
+	ld	s2,48(sp)		#,
+	.cfi_restore 18
+	ld	s4,32(sp)		#,
+	.cfi_restore 20
+	ld	s5,24(sp)		#,
+	.cfi_restore 21
+	ld	s3,40(sp)		#,
+	.cfi_restore 19
+	ld	s6,16(sp)		#,
+	.cfi_restore 22
+	ld	s7,8(sp)		#,
+	.cfi_restore 23
+	addi	sp,sp,80	#,,
+	.cfi_def_cfa_offset 0
+	jr	ra		#
+.L44:
+	.cfi_def_cfa_offset 80
+	.cfi_offset 1, -8
+	.cfi_offset 8, -16
+	.cfi_offset 9, -24
+	.cfi_offset 18, -32
+	.cfi_offset 19, -40
+	.cfi_offset 20, -48
+	.cfi_offset 21, -56
+	.cfi_offset 22, -64
+	.cfi_offset 23, -72
+	.cfi_offset 24, -80
+	mv	a5,s2	# ivtmp.74, prephitmp_17
+	mv	a4,a0	# ivtmp.75, _38
+	add	a2,s2,s1	# ivtmp.90, _60, prephitmp_17
+.L48:
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	lw	a3,0(a5)		# _73, MEM[(int *)_44]
+# memory/allocator.hpp:105:     for (size_t i = 0; i < size; ++i) {
+	addi	a5,a5,4	#, ivtmp.74, ivtmp.74
+	addi	a4,a4,4	#, ivtmp.75, ivtmp.75
+# memory/allocator.hpp:106:         dest[i] = data[i];
+	sw	a3,-4(a4)	# _73, MEM[(int *)_45]
+# memory/allocator.hpp:105:     for (size_t i = 0; i < size; ++i) {
+	bne	a5,a2,.L48	#, ivtmp.74, _60,
+	j	.L49		#
+.L71:
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	slli	a0,s7,3	#,, prephitmp_25
+	call	_Znwm		#
+	mv	s2,a0	# prephitmp_17, tmp206
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	sd	a0,0(s3)	# prephitmp_17, *this_5(D).data_
+# util/vec.hpp:19:             capacity_ = new_size;
+	sd	s8,16(s3)	# _30, *this_5(D).capacity_
+	mv	s7,s8	# prephitmp_25, _30
+	mv	s4,s0	# prephitmp_32, _33
+	j	.L41		#
+.L40:
+	.cfi_restore 8
+	.cfi_restore 9
+	.cfi_restore 18
+	.cfi_restore 20
+	.cfi_restore 21
+	.cfi_restore 24
+	sd	s0,64(sp)	#,
+	sd	s1,56(sp)	#,
+	sd	s2,48(sp)	#,
+	sd	s4,32(sp)	#,
+	sd	s5,24(sp)	#,
+	sd	s8,0(sp)	#,
+	.cfi_offset 8, -16
+	.cfi_offset 9, -24
+	.cfi_offset 18, -32
+	.cfi_offset 20, -48
+	.cfi_offset 21, -56
+	.cfi_offset 24, -80
+# util/vec.hpp:18:             data_ = ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+	call	__cxa_throw_bad_array_new_length		#
+	.cfi_endproc
+.LFE4125:
+	.size	_ZN4rstd3vecIiEC2Em, .-_ZN4rstd3vecIiEC2Em
+	.weak	_ZN4rstd3vecIiEC1Em
+	.set	_ZN4rstd3vecIiEC1Em,_ZN4rstd3vecIiEC2Em
+	.section	.rodata.str1.8,"aMS",@progbits,1
+	.align	3
+.LC0:
+	.string	"\n"
+	.section	.text.startup,"ax",@progbits
+	.align	1
+	.globl	main
+	.type	main, @function
+main:
+.LFB3818:
+	.cfi_startproc
+	addi	sp,sp,-48	#,,
+	.cfi_def_cfa_offset 48
+# main.cpp:35:     rstd::vec<int> a(100);
+	li	a1,100		#,
+	addi	a0,sp,8	#,,
+# main.cpp:34: int main() {
+	sd	ra,40(sp)	#,
+	.cfi_offset 1, -8
+# main.cpp:35:     rstd::vec<int> a(100);
+	call	_ZN4rstd3vecIiEC1Em		#
+# util/vec.hpp:101:     T& operator[](size_t index) { return data_[index]; }
+	ld	a1,8(sp)		# _8, a.data_
+	lui	a3,%hi(.LC0)	# tmp147,
+	addi	a3,a3,%lo(.LC0)	# tmp148, tmp147,
+	mv	a5,a1	# ivtmp.102, _8
+	addi	a2,a1,400	#, _3, _8
+.L73:
+# main.cpp:37:         rsyscall::print_int(a[i]);
+	lw	a4,0(a5)		# MEM[(int &)_12], MEM[(int &)_12]
+# memory/../syscall/syscall.hpp:32:     __asm__ volatile("li a7, 1\n\t"
+#APP
+# 32 "memory/../syscall/syscall.hpp" 1
+	li a7, 1
+	mv a0, a4	# MEM[(int &)_12]
+	ecall
+	
+# 0 "" 2
+# memory/../syscall/syscall.hpp:41:     __asm__ volatile("li a7, 4\n\t"
+# 41 "memory/../syscall/syscall.hpp" 1
+	li a7, 4
+	mv a0, a3	# tmp148
+	ecall
+	
+# 0 "" 2
+# main.cpp:36:     for (size_t i = 0; i < 100; ++i) {
+#NO_APP
+	addi	a5,a5,4	#, ivtmp.102, ivtmp.102
+	bne	a2,a5,.L73	#, _3, ivtmp.102,
+# memory/../syscall/syscall.hpp:23:     __asm__ volatile("addi a7, zero, 93\n\t"
+	li	a5,0		# tmp145,
+#APP
+# 23 "memory/../syscall/syscall.hpp" 1
+	addi a7, zero, 93
+	add a0, zero, a5	# tmp145
+	ecall
+	
+# 0 "" 2
+# main.cpp:41: }
+#NO_APP
+	ld	ra,40(sp)		#,
+	.cfi_restore 1
+# memory/allocator.hpp:89:     block->used = false;
+	sb	zero,-16(a1)	#, MEM[(struct Block *)_8 + -24B].used
+# main.cpp:41: }
+	li	a0,0		#,
+	addi	sp,sp,48	#,,
+	.cfi_def_cfa_offset 0
+	jr	ra		#
+	.cfi_endproc
+.LFE3818:
+	.size	main, .-main
+	.align	1
+	.type	_GLOBAL__sub_I__Znwm, @function
+_GLOBAL__sub_I__Znwm:
+.LFB4523:
+	.cfi_startproc
+# memory/allocator.hpp:23: static auto top = heapStart;
+	lui	a5,%hi(_ZN6memoryL9heapStartE)	# tmp136,
+	ld	a4,%lo(_ZN6memoryL9heapStartE)(a5)		# heapStart, heapStart
+	lui	a5,%hi(_ZN6memoryL3topE)	# tmp135,
+	sd	a4,%lo(_ZN6memoryL3topE)(a5)	# heapStart, top
+# main.cpp:41: }
+	ret	
+	.cfi_endproc
+.LFE4523:
+	.size	_GLOBAL__sub_I__Znwm, .-_GLOBAL__sub_I__Znwm
+	.section	.init_array,"aw"
+	.align	3
+	.dword	_GLOBAL__sub_I__Znwm
+	.section	.sbss,"aw",@nobits
+	.align	3
+	.type	_ZN6memoryL3topE, @object
+	.size	_ZN6memoryL3topE, 8
+_ZN6memoryL3topE:
+	.zero	8
+	.type	_ZN6memoryL9heapStartE, @object
+	.size	_ZN6memoryL9heapStartE, 8
+_ZN6memoryL9heapStartE:
+	.zero	8
+	.ident	"GCC: (gc891d8dc23e-dirty) 13.2.0"
+	.section	.note.GNU-stack,"",@progbits

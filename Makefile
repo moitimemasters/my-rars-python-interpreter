@@ -3,7 +3,7 @@ all-debug: all debug-asm
 all-run: all run-asm
 
 raw-asm:
-	riscv64-unknown-linux-gnu-g++ -std=c++20 -fverbose-asm -S main.cpp -o main -Os
+	riscv64-unknown-linux-gnu-g++ -std=c++20 -fverbose-asm -S main.cpp -o build/main -O3 
 
 cleanup-asm:
 	python cleanup_asm.py
@@ -12,7 +12,7 @@ fix-asm:
 	python fix_asm.py
 
 run-asm:
-	rars.jar rv64 sm smc fixed.asm
+	rars.jar rv64 sm smc build/fixed.asm
 
 debug-asm:
-	rars.jar fixed.asm g
+	rars.jar build/fixed.asm g

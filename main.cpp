@@ -1,23 +1,33 @@
-#include "allocator.hpp"
-#include "syscall.hpp"
+#include "memory/allocator.hpp"
+#include "memory/pointers.hpp"
+#include "syscall/syscall.hpp"
+#include "util/vec.hpp"
 
-int
-main()
-{
-    int64_t descriptor = rsyscall::open_file("/home/ivanpesnya/a.rs", 0);
-    if (descriptor < 0) {
-        rsyscall::print_string("couldn't load file\n");
-        rsyscall::exit(1);
+void* operator new(std::size_t size) {
+    if (void* p = memory::alloc(size))
+        return p;
+    throw std::bad_alloc{};
+}
+
+void operator delete(void* p) {
+    memory::free(reinterpret_cast<memory::word_t*>(p));
+}
+
+void* operator new[](std::size_t size) {
+    if (void* p = memory::alloc(size))
+        return p;
+    throw std::bad_alloc{};
+}
+
+void operator delete[](void* p) {
+    memory::free(reinterpret_cast<memory::word_t*>(p));
+}
+
+int main() {
+    rstd::vec<int> a(100);
+    for (size_t i = 0; i < 100; ++i) {
+        rsyscall::print_int(a[i]);
+        rsyscall::print_string("\n");
     }
-    char* buffer = (char*)memory::alloc(sizeof(char) * 128);
-    int64_t bytes_read =
-      rsyscall::read_from_descriptor(descriptor, buffer, 128);
-    if (bytes_read < 0) {
-        rsyscall::print_string("couldn't read from descriptor\n");
-    }
-    rsyscall::print_string("===FILE CONTENTS===\n");
-    rsyscall::print_string(buffer);
-    rsyscall::print_string("===END OF FILE===\n");
-    rsyscall::close_file(descriptor);
     rsyscall::exit(0);
 }

@@ -1,7 +1,19 @@
-with open("main") as f:
+with open("build/main") as f:
     contents = f.readlines()
 
-unknown_directives = [".type", ".file", ".attribute", ".option", ".cfi", ".size", ".zero", ".ident", ".section"]
+unknown_directives = [
+    ".weak",
+    ".loc",
+    ".type",
+    ".file",
+    ".attribute",
+    ".option",
+    ".cfi",
+    ".size",
+    ".zero",
+    ".ident",
+    ".section",
+]
 
 
 def in_unknown_directives(line: str) -> bool:
@@ -29,8 +41,9 @@ def remove_comments(line: str) -> str:
 contents = filter(lambda x: not x.strip().startswith("#"), contents)
 contents = filter(in_unknown_directives, contents)
 contents = filter(restrict_align, contents)
+contents = filter(lambda x: "throw" not in x, contents)
 contents = map(remove_comments, contents)
 
 
-with open("clean.asm", "w") as f:
+with open("build/clean.asm", "w") as f:
     f.writelines(contents)
