@@ -1,9 +1,68 @@
+from subprocess import PIPE, Popen
 import re
 
-with open("build/clean.asm") as f:
-    contents = f.readlines()
+REPLACEMENTS = {}
 
-contents = list(map(str.strip, contents))
+ABORT_FUNCTION = ["abort:", "li a7, 93", "li a0, 1", "ecall"]
+
+PRELUDE = [*ABORT_FUNCTION]
+
+with open("build/clean.asm") as f:
+    cntns = f.readlines()
+
+
+def demangle_symbol(symbol: str) -> str:
+    with Popen(("c++filt", symbol), stdout=PIPE, universal_newlines=True) as process:
+        process.wait()
+        return process.stdout.read().strip()
+    
+
+
+def demangle_globals_and_labels(line: str) -> tuple[str, ...]:
+    if line.startswith(".globl"):
+        demangled = demangle_symbol(line[7:])
+        return line ,f"#\t{demangled}"
+    if line.endswith(":"):
+        demangled = demangle_symbol(line[:-1])
+        return line, f"#\t{demangled}"
+    return (line,)
+
+def get_comm(line: str) -> tuple[str, int, int] | None:
+    regexp = re.compile(r"\.comm.(\w+),(\d),(\d)")
+    if found := regexp.findall(line):
+        label, size, alignment = found[0]
+        size = int(size)
+        alignment = int(alignment)
+        if alignment == 8:
+            alignment = 3
+        elif alignment == 4:
+            alignment = 2
+        elif alignment == 2:
+            alignment = 1
+        else:
+            alignment = 0
+        return label, size, alignment
+    return None
+
+
+def expand_comm(line: str) -> tuple[str, ...]:
+    if comm := get_comm(line):  # type: ignore
+        label, size, alignment = comm
+        return (
+            ".data",
+            f".align {alignment}",
+            label + ":",
+            f".space {size}",
+            ".text",
+        )
+    return (line,)
+
+
+contents = PRELUDE
+for line in cntns:
+    for extended_demangling in demangle_globals_and_labels(line.strip()):
+        contents.extend(expand_comm(extended_demangling))
+
 
 result = []
 
@@ -58,7 +117,7 @@ while current < len(contents):
 
 
 def parse_broken_instruction(instr: str) -> tuple[str, str, str, str] | None:
-    regex = re.compile("(s\w).(\w\d),%lo\((\w+)\)\((\w\d)\)")
+    regex = re.compile(r"(s\w).(\w\d),%lo\((\w+)\)\((\w\d)\)")
     if found := regex.findall(instr):
         return found[0]
     return None
@@ -90,10 +149,16 @@ def fix_store_instruction(result):
             yield "ld t0,(sp)"
             yield "addi sp,sp,-4"
         elif line.startswith(".set"):
-            yield ".eqv" + line[4:]
+            what, to = line[5:].split(",")
+            REPLACEMENTS[what] = to
         else:
             yield line
 
 
+resulting_content = "\n".join(fix_store_instruction(filter_double_sections(result)))
+
+for what, to in REPLACEMENTS.items():
+    resulting_content = resulting_content.replace(what, to)
+
 with open("build/fixed.asm", "w") as f:
-    f.writelines(map(lambda x: x + "\n", fix_store_instruction(filter_double_sections(result))))
+    f.write(resulting_content)

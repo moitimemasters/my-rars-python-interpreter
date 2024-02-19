@@ -22,6 +22,7 @@ template <class T> class vec {
 
         T* new_data =
             ::new (::operator new[](sizeof(T) * new_size)) T[new_size];
+
         memory::memmove(new_data, data_, size_);
         capacity_ = new_size;
         ::operator delete[](data_);
@@ -31,10 +32,10 @@ template <class T> class vec {
   public:
     vec() { reserve(1); }
 
-    explicit vec(size_t size) {
+    explicit vec(size_t size, T element = 0) {
         reserve(size);
         for (auto i = 0; i < size; ++i) {
-            push_back(0);
+            push_back(element);
         }
     }
 

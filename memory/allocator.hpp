@@ -107,4 +107,12 @@ template <class T> void memmove(T* dest, T* data, size_t size) {
     }
 }
 
+template<class T> void memswap(T* dest, T* data) {
+    auto dest_int = reinterpret_cast<intptr_t>(dest);
+    auto data_int = reinterpret_cast<intptr_t>(data);
+    std::swap(dest_int, data_int);
+    dest = reinterpret_cast<T*>(dest_int);
+    data = reinterpret_cast<T*>(data_int);
+}
+
 } // namespace memory

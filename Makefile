@@ -3,7 +3,7 @@ all-debug: all debug-asm
 all-run: all run-asm
 
 raw-asm:
-	riscv64-unknown-linux-gnu-g++ -std=c++20 -fverbose-asm -S main.cpp -o build/main -O3 
+	riscv64-unknown-linux-gnu-g++ -std=c++20 -fno-exceptions -fverbose-asm -S main.cpp -o build/main -O0 -static 
 
 cleanup-asm:
 	python cleanup_asm.py
