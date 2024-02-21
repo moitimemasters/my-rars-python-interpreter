@@ -15,7 +15,7 @@ def demangle_symbol(symbol: str) -> str:
     with Popen(("c++filt", symbol), stdout=PIPE, universal_newlines=True) as process:
         process.wait()
         return process.stdout.read().strip()
-    
+
 
 
 def demangle_globals_and_labels(line: str) -> tuple[str, ...]:
@@ -28,7 +28,7 @@ def demangle_globals_and_labels(line: str) -> tuple[str, ...]:
     return (line,)
 
 def get_comm(line: str) -> tuple[str, int, int] | None:
-    regexp = re.compile(r"\.comm.(\w+),(\d),(\d)")
+    regexp = re.compile(r"\.comm.(\w+),(\d+),(\d+)")
     if found := regexp.findall(line):
         label, size, alignment = found[0]
         size = int(size)
@@ -117,7 +117,7 @@ while current < len(contents):
 
 
 def parse_broken_instruction(instr: str) -> tuple[str, str, str, str] | None:
-    regex = re.compile(r"(s\w).(\w\d),%lo\((\w+)\)\((\w\d)\)")
+    regex = re.compile(r"((?:s|lb)\w).(\w\d|zero).%lo\((\w+)\)\((\w\d)\)")
     if found := regex.findall(instr):
         return found[0]
     return None
@@ -139,6 +139,8 @@ def filter_double_sections(result):
 
 def fix_store_instruction(result):
     for line in result:
+        if "__cxxabi" in line:
+            continue
         if parsed := parse_broken_instruction(line):
             instr, fr, label, to = parsed
             yield "addi sp,sp,4"
@@ -158,6 +160,7 @@ def fix_store_instruction(result):
 resulting_content = "\n".join(fix_store_instruction(filter_double_sections(result)))
 
 for what, to in REPLACEMENTS.items():
+    print(what, to)
     resulting_content = resulting_content.replace(what, to)
 
 with open("build/fixed.asm", "w") as f:

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "result.hpp"
 #include "../memory/allocator.hpp"
+#include "result.hpp"
 #include <functional>
 #include <tuple>
 #include <type_traits>
@@ -253,7 +253,7 @@ class string {
 
     inline ~string() { clear(); }
 
-    inline string(string& other)
+    inline string(const string& other)
         : size_(other.size()), capacity_(other.capacity()) {
         if (this == &other) {
             return;
@@ -267,11 +267,11 @@ class string {
         data_ =
             ::new (::operator new[](sizeof(char) * capacity_)) char[capacity_];
         for (auto i = 0; i < size_; ++i) {
-            data_[i] = other[i].ok_value().get();
+            data_[i] = other[i];
         }
     }
 
-    inline string& operator=(string& other) {
+    inline string& operator=(const string& other) {
         if (this == &other) {
             return *this;
         }
@@ -283,47 +283,28 @@ class string {
                                                     capacity_)) char[capacity_]
                           : nullptr;
         for (auto i = 0; i < size_; ++i) {
-            data_[i] = other[i].ok_value().get();
+            data_[i] = other[i];
         }
         return *this;
     }
 
-    inline Result<std::reference_wrapper<char>, string_out_of_range>
-    operator[](size_t idx) {
-        if (idx >= size_) {
-            return Err(string_out_of_range{});
-        }
+    inline char& operator[](size_t idx) { return *(data_ + idx); }
 
-        return Ok(std::ref(*(data_ + idx)));
-    }
+    inline const char& operator[](size_t idx) const { return *(data_ + idx); }
 
-    inline Result<std::reference_wrapper<char>, string_out_of_range>
-    at(size_t idx) {
-        return (*this)[idx];
-    }
+    inline char& at(size_t idx) { return (*this)[idx]; }
+    inline const char& at(size_t idx) const { return (*this)[idx]; }
 
-    inline Result<std::reference_wrapper<char>, string_out_of_range> front() {
-        if (empty()) {
-            return Err(string_out_of_range{});
-        }
+    inline char& front() { return *data_; }
+    inline const char& front() const { return *data_; }
 
-        return Ok(std::ref(*data_));
-    }
-
-    inline Result<std::reference_wrapper<char>, string_out_of_range> back() {
-        if (empty()) {
-            Err<string_out_of_range>(string_out_of_range{});
-        }
-
-        return Ok(std::ref(*(data_ + size_ - 1)));
-    }
+    inline char& back() { return *(data_ + size_ - 1); }
+    inline const char& back() const { return *(data_ + size_ - 1); }
 
     inline const char* data() const { return data_; }
-
     inline char* data() { return data_; }
 
     inline const char* c_str() const { return data_; }
-
     inline char* c_str() { return data_; }
 
     inline bool empty() const { return size_ == 0; }
@@ -433,12 +414,12 @@ class string {
         data_ = new_data;
     }
 
-    inline int compare(string& other) {
+    inline int compare(const string& other) const {
         if (size_ >= other.size()) {
             for (auto i = 0; i < other.size(); ++i) {
-                if (at(i).ok_value().get() < other[i].ok_value().get()) {
+                if (at(i) < other[i]) {
                     return 1;
-                } else if (at(i).ok_value().get() > other[i].ok_value().get()) {
+                } else if (at(i) > other[i]) {
                     return -1;
                 }
             }
@@ -447,9 +428,9 @@ class string {
         }
 
         for (auto i = 0; i < size_; ++i) {
-            if (at(i).ok_value().get() < other[i].ok_value().get()) {
+            if (at(i) < other[i]) {
                 return 1;
-            } else if (at(i).ok_value().get() > other[i].ok_value().get()) {
+            } else if (at(i) > other[i]) {
                 return -1;
             }
         }
@@ -457,22 +438,23 @@ class string {
         return 1;
     }
 
-    inline string& operator+=(string& other) {
+    inline string& operator+=(const string& other) {
         for (size_t i = 0; i < other.size(); ++i) {
-            this->push_back(other[i].ok_value());
+            this->push_back(other[i]);
         }
         return *this;
     }
 
-    inline friend rstd::string operator+(string& first, string& second) {
+    inline friend rstd::string operator+(const string& first,
+                                         const string& second) {
         rstd::string sum(first.size() + second.size(), ' ');
 
         auto first_size = first.size();
         for (auto i = 0; i < first_size; ++i) {
-            sum[i].ok_value().get() = first[i].ok_value().get();
+            sum[i] = first[i];
         }
         for (auto i = 0; i < second.size(); ++i) {
-            sum[first_size + i].ok_value().get() = second[i].ok_value().get();
+            sum[first_size + i] = second[i];
         }
 
         return sum;
@@ -481,13 +463,13 @@ class string {
 
 } // namespace rstd
 
-inline bool operator==(rstd::string& first, rstd::string& second) {
+inline bool operator==(const rstd::string& first, const rstd::string& second) {
     if (first.size() != second.size()) {
         return false;
     }
 
     for (auto i = 0; i < first.size(); ++i) {
-        if (first[i].ok_value() != second[i].ok_value()) {
+        if (first[i] != second[i]) {
             return false;
         }
     }
@@ -495,23 +477,23 @@ inline bool operator==(rstd::string& first, rstd::string& second) {
     return true;
 }
 
-inline bool operator!=(rstd::string& first, rstd::string& second) {
+inline bool operator!=(const rstd::string& first, const rstd::string& second) {
     return !(first == second);
 }
 
-inline bool operator>(rstd::string& first, rstd::string& second) {
+inline bool operator>(const rstd::string& first, const rstd::string& second) {
     return first.compare(second) < 0;
 }
 
-inline bool operator<(rstd::string& first, rstd::string& second) {
+inline bool operator<(const rstd::string& first, const rstd::string& second) {
     return first.compare(second) > 0;
 }
 
-inline bool operator>=(rstd::string& first, rstd::string& second) {
+inline bool operator>=(const rstd::string& first, const rstd::string& second) {
     return first.compare(second) <= 0;
 }
 
-inline bool operator<=(rstd::string& first, rstd::string& second) {
+inline bool operator<=(const rstd::string& first, const rstd::string& second) {
     return first.compare(second) >= 0;
 }
 

@@ -37,16 +37,16 @@ inline void print_string(const char* str) {
 }
 
 inline int64_t open_file(const char* path, int64_t flag) {
-    int64_t descriptor;
+    int64_t open_file_descriptor;
     __asm__ volatile("li a7, 1024\n\t"
                      "mv a0, %1\n\t"
                      "mv a1, %2\n\t"
                      "ecall \n\t"
                      "mv %0, a0 \n\t"
-                     : "=r"(descriptor)
+                     : "=r"(open_file_descriptor)
                      : "r"(path), "r"(flag)
                      : "a7", "a0", "a1");
-    return descriptor;
+    return open_file_descriptor;
 }
 
 inline void close_file(int64_t descriptor) {
@@ -56,7 +56,7 @@ inline void close_file(int64_t descriptor) {
                      : "a7", "a0");
 }
 
-inline int64_t read_from_descriptor(int descriptor, char* buffer,
+inline int64_t read_from_descriptor(int64_t descriptor, char* buffer,
                                     int64_t max_length) {
     int64_t bytes_read;
     __asm__ volatile("li a7, 63\n\t"

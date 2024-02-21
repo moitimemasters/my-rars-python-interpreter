@@ -1,1 +1,2 @@
-1 + 2 + 3
+def foo(a, b):
+    return a + b

@@ -33,9 +33,11 @@ def restrict_align(line: str) -> bool:
 
 
 def remove_comments(line: str) -> str:
-    if "#" not in line:
-        return line
-    return line[: line.index("#")] + "\n"
+    if "#" in line:
+        return line[: line.index("#")] + "\n"
+    if line.startswith("/"):
+        return ""
+    return line
 
 
 contents = filter(lambda x: not x.strip().startswith("#"), contents)
