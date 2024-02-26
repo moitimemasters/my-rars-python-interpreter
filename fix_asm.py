@@ -117,7 +117,7 @@ while current < len(contents):
 
 
 def parse_broken_instruction(instr: str) -> tuple[str, str, str, str] | None:
-    regex = re.compile(r"((?:s|lb)\w).(\w\d|zero).%lo\((\w+)\)\((\w\d)\)")
+    regex = re.compile(r"((?:s|lb)\w).(\w\d+|zero).%lo\((\w+)\)\((\w\d+)\)")
     if found := regex.findall(instr):
         return found[0]
     return None

@@ -64,6 +64,11 @@ inline word_t* alloc(size_t size) {
     }
 
     auto block = requestFromOS(size);
+    if (block == nullptr) {
+        rsyscall::print_string("Out of memory\n");
+        rsyscall::exit(1);
+        return nullptr;
+    }
 
     block->size = size;
     block->used = true;
